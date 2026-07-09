@@ -76,15 +76,65 @@
         </section>
 
         <section class="timeline-card">
-          <div class="step done"><span>✓</span><strong>Postulación recibida</strong><small>{{ s.fechaPostulacion }}</small></div>
+          <div class="step done">
+            <span>✓</span>
+            <strong>Postulación recibida</strong>
+            <small>{{ s.fechaPostulacion }}</small>
+          </div>
+
           <div class="line"></div>
-          <div class="step done"><span>✓</span><strong>Revisión inicial</strong><small>2026-06-25</small><em>Completado</em></div>
+
+          <div class="step" [class.done]="s.estado !== 'Recibida'" [class.current]="s.estado === 'Recibida'">
+            <span>✓</span>
+            <strong>Revisión inicial</strong>
+            <small>{{ s.estado === 'Recibida' ? 'Pendiente' : s.fechaUltimaRevision }}</small>
+            @if (s.estado !== 'Recibida') {
+              <em>Completado</em>
+            }
+          </div>
+
           <div class="line"></div>
-          <div class="step current"><span>⌛</span><strong>En revisión</strong><small>{{ s.fechaUltimaRevision }}</small><em>Actual</em></div>
+
+          <div class="step" [class.current]="s.estado === 'En revisión'" [class.done]="s.estado === 'Aprobada' || s.estado === 'Rechazada' || s.estado === 'Corrección requerida'">
+            <span>⌛</span>
+            <strong>En revisión</strong>
+            <small>{{ s.estado === 'En revisión' ? s.fechaUltimaRevision : 'Pendiente' }}</small>
+            @if (s.estado === 'En revisión') {
+              <em>Actual</em>
+            }
+          </div>
+
           <div class="line"></div>
-          <div class="step pending"><span>📄</span><strong>Dictamen</strong><small>Pendiente</small></div>
+
+          <div class="step" [class.current]="s.estado === 'Corrección requerida'" [class.done]="s.estado === 'Aprobada' || s.estado === 'Rechazada'">
+            <span>📄</span>
+            <strong>Dictamen</strong>
+            <small>
+              @if (s.estado === 'Corrección requerida') {
+                Corrección requerida
+              } @else if (s.estado === 'Aprobada' || s.estado === 'Rechazada') {
+                Emitido
+              } @else {
+                Pendiente
+              }
+            </small>
+          </div>
+
           <div class="line"></div>
-          <div class="step pending"><span>☑</span><strong>Resultado final</strong><small>Pendiente</small></div>
+
+          <div class="step" [class.done]="s.estado === 'Aprobada'" [class.rejected]="s.estado === 'Rechazada'" [class.pending]="s.estado !== 'Aprobada' && s.estado !== 'Rechazada'">
+            <span>{{ s.estado === 'Rechazada' ? '✕' : '☑' }}</span>
+            <strong>Resultado final</strong>
+            <small>
+              @if (s.estado === 'Aprobada') {
+                Aprobada
+              } @else if (s.estado === 'Rechazada') {
+                Rechazada
+              } @else {
+                Pendiente
+              }
+            </small>
+          </div>
         </section>
 
         <section class="dashboard-grid">
@@ -136,9 +186,57 @@
           <table>
             <thead><tr><th>Fecha</th><th>Acción</th><th>Descripción</th><th>Usuario</th></tr></thead>
             <tbody>
-              <tr><td>{{ s.fechaUltimaRevision }} 10:30</td><td><span class="pill orange">En revisión</span></td><td>La solicitud está siendo revisada por la comisión.</td><td>Comisión de Becas</td></tr>
-              <tr><td>2026-06-25 15:45</td><td><span class="pill green">Revisión inicial</span></td><td>Revisión inicial completada correctamente.</td><td>Sistema</td></tr>
-              <tr><td>{{ s.fechaPostulacion }} 09:22</td><td><span class="pill green">Postulación recibida</span></td><td>Solicitud de beca registrada exitosamente.</td><td>{{ s.estudiante.nombre }}</td></tr>
+              <tr>
+                <td>{{ s.fechaPostulacion }}</td>
+                <td><span class="pill green">Postulación recibida</span></td>
+                <td>Solicitud registrada correctamente.</td>
+                <td>{{ s.estudiante.nombre }}</td>
+              </tr>
+
+              @if (s.estado !== 'Recibida') {
+                <tr>
+                  <td>{{ s.fechaUltimaRevision }}</td>
+                  <td><span class="pill green">Revisión inicial</span></td>
+                  <td>La solicitud pasó a revisión inicial.</td>
+                  <td>Sistema</td>
+                </tr>
+              }
+
+              @if (s.estado === 'En revisión') {
+                <tr>
+                  <td>{{ s.fechaUltimaRevision }}</td>
+                  <td><span class="pill orange">En revisión</span></td>
+                  <td>La solicitud está siendo revisada por la comisión.</td>
+                  <td>Comisión de Becas</td>
+                </tr>
+              }
+
+              @if (s.estado === 'Aprobada') {
+                <tr>
+                  <td>{{ s.fechaUltimaRevision }}</td>
+                  <td><span class="pill green">Aprobada</span></td>
+                  <td>La solicitud fue aprobada.</td>
+                  <td>Comisión de Becas</td>
+                </tr>
+              }
+
+              @if (s.estado === 'Rechazada') {
+                <tr>
+                  <td>{{ s.fechaUltimaRevision }}</td>
+                  <td><span class="pill orange">Rechazada</span></td>
+                  <td>La solicitud fue rechazada.</td>
+                  <td>Comisión de Becas</td>
+                </tr>
+              }
+
+              @if (s.estado === 'Corrección requerida') {
+                <tr>
+                  <td>{{ s.fechaUltimaRevision }}</td>
+                  <td><span class="pill orange">Corrección requerida</span></td>
+                  <td>La solicitud requiere correcciones.</td>
+                  <td>Comisión de Becas</td>
+                </tr>
+              }
             </tbody>
           </table>
         </section>

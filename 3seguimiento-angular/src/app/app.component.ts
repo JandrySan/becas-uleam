@@ -23,10 +23,10 @@ export class AppComponent implements OnInit {
     const data = event.data || {};
     if (data.tipo === 'BECAS_PORTAL_STATE') {
       this.auth.aplicarSesion(data.session);
-      this.store.actualizarDesdePortal(data.datos, data.documentos);
+      this.store.actualizarDesdePortal();
     }
     if (data.tipo === 'BECAS_POSTULACION_ENVIADA' || data.tipo === 'BECAS_POSTULACION_UPDATE') {
-      this.store.actualizarDesdePortal(data.datos, data.documentos);
+      this.store.actualizarDesdePortal();
     }
   }
 }

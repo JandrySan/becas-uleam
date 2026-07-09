@@ -17,8 +17,7 @@ export class SolicitudDetalleComponent {
 
   solicitud = computed(() => {
     const encontrada = this.store.buscarPorId(this.id);
-    const usuario = this.auth.usuario();
-    if (!encontrada || !usuario) return undefined;
-    return usuario.rol === 'administrador' || encontrada.estudiante.id === usuario.estudianteId ? encontrada : undefined;
+    if (!encontrada) return undefined;
+    return encontrada;
   });
 }

@@ -4,14 +4,14 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "01-verificador-elegibilidad-vue",
-    "02-postulacion-documentos-react",
-    "03-seguimiento-solicitud-angular"
+    "1verificador-vue",
+    "2postulacion-react",
+    "3seguimiento-angular"
   ],
   "scripts": {
-    "start": "concurrently -n PORTAL,VUE,REACT,ANGULAR -c auto \"npm run portal\" \"npm --workspace 01-verificador-elegibilidad-vue run dev -- --host 0.0.0.0 --port 5173\" \"npm --workspace 02-postulacion-documentos-react run dev -- --host 0.0.0.0 --port 5174\" \"npm --workspace 03-seguimiento-solicitud-angular run start -- --host 0.0.0.0 --port 4200\"",
+    "start": "concurrently -n PORTAL,VUE,REACT,ANGULAR -c auto \"npm run portal\" \"npm --workspace 1verificador-vue run dev -- --host 0.0.0.0 --port 5173\" \"npm --workspace 2postulacion-react run dev -- --host 0.0.0.0 --port 5174\" \"npm --workspace 3seguimiento-angular run start -- --host 0.0.0.0 --port 4200\"",
     "portal": "vite --host 0.0.0.0 --port 3000",
-    "build": "vite build && npm --workspace 01-verificador-elegibilidad-vue run build && npm --workspace 02-postulacion-documentos-react run build && npm --workspace 03-seguimiento-solicitud-angular run build -- --base-href /angular/ && node scripts/build-integrado.mjs",
+    "build": "vite build && npm --workspace 1verificador-vue run build && npm --workspace 2postulacion-react run build && npm --workspace 3seguimiento-angular run build -- --base-href /angular/ && node scripts/build-integrado.mjs",
     "dev": "vite --host 0.0.0.0 --port 3000"
   },
   "devDependencies": {

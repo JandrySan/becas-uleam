@@ -23,8 +23,8 @@ const loginStatus = $('loginStatus');
 
 if (location.hostname === 'localhost' && location.port === '3000') {
   const devUrls = [
-    'http://localhost:5173',
-    'http://localhost:5174',
+    'http://localhost:5173/vue/',
+    'http://localhost:5174/react/',
     'http://localhost:4200/#/seguimiento'
   ];
 
@@ -97,9 +97,16 @@ function activate(btn: HTMLButtonElement) {
 }
 
 function activateBySrc(src: string) {
-  const btn = buttons.find((b) => (b.dataset.src || '').startsWith(src));
-  if (btn && !btn.disabled) activate(btn);
+  const btn = buttons.find((b) => {
+    const url = b.dataset.src || '';
+    return url.includes(src);
+  });
+
+  if (btn && !btn.disabled) {
+    activate(btn);
+  }
 }
+
 
 function showApp(session: Sesion) {
   loginPanel.classList.add('hidden');
@@ -181,6 +188,13 @@ frame.addEventListener('load', () => setTimeout(sendState, 350));
 
 window.addEventListener('message', (event) => {
   const data = event.data || {};
+
+  if (data.tipo === 'BECAS_DATOS_ESTUDIANTE') {
+    localStorage.setItem('becas_datos_estudiante', JSON.stringify(data.datos));
+    localStorage.setItem('becas_nombre', data.datos?.nombreCompleto || '');
+    localStorage.setItem('becas_email', data.datos?.correo || '');
+    sendState();
+  }
 
   if (data.modulo === 'postulacion') activateBySrc('/react/');
   if (data.modulo === 'seguimiento') activateBySrc('/angular/');

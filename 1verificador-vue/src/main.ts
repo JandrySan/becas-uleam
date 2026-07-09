@@ -1,5 +1,3 @@
-const token = localStorage.getItem('token')
-if (!token && window.location.pathname !== '/') window.location.href = '/'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

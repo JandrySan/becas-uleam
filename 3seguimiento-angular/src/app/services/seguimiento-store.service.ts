@@ -1,76 +1,188 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { SOLICITUDES_MOCK } from '../data/solicitudes.mock';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { EstadoSolicitud, SolicitudBeca } from '../models/beca.model';
+import { SupabaseService } from './supabase.service';
 
-function documentosPendientesDesdeDocs(documentos: any): string[] {
-  const pendientes: string[] = [];
-  if (!documentos?.cedula) pendientes.push('Cédula');
-  if (!documentos?.record) pendientes.push('Récord académico');
-  if (!documentos?.planilla) pendientes.push('Planilla de luz');
-  return pendientes;
-}
-function aplicarDatos(listaBase: SolicitudBeca[], datos: any, documentos?: any): SolicitudBeca[] {
-  const lista = structuredClone(listaBase) as SolicitudBeca[];
-  if (!datos) return lista;
-  const pendientes = documentos ? documentosPendientesDesdeDocs(documentos) : lista[0].documentosPendientes;
-  lista[0] = {
-    ...lista[0],
-    estudiante: {
-      ...lista[0].estudiante,
-      id: 1,
-      nombre: datos.nombreCompleto || [datos.nombres, datos.apellidos].filter(Boolean).join(' ') || lista[0].estudiante.nombre,
-      cedula: datos.cedula || lista[0].estudiante.cedula,
-      carrera: datos.carrera || lista[0].estudiante.carrera,
-      semestre: Number(datos.semestre || lista[0].estudiante.semestre),
-      promedio: Number(datos.promedio || lista[0].estudiante.promedio),
-      correo: datos.correo || datos.email || '',
-      telefono: datos.telefono || '',
-      ingreso: Number(datos.ingreso || 0),
-      cargaFamiliar: Number(datos.cargaFamiliar || 0),
-      quintil: Number(datos.quintil || 0),
-      padreNombre: datos.padreNombre || '',
-      madreNombre: datos.madreNombre || '',
-      hermanos: Number(datos.hermanos || 0),
-      vivienda: datos.vivienda || ''
-    },
-    beca: {
-      ...lista[0].beca,
-      nombre: Number(datos.promedio || 0) >= 8.5 ? 'Beca por Excelencia Académica' : 'Beca Socioeconómica',
-      tipo: Number(datos.promedio || 0) >= 8.5 ? 'Académica' : 'Socioeconómica'
-    },
-    estado: pendientes.length ? 'Corrección requerida' : 'En revisión',
-    observaciones: pendientes.length ? 'La postulación fue recibida, pero aún faltan documentos por completar.' : 'La solicitud fue recibida y se están validando los documentos cargados.',
-    documentosPendientes: pendientes,
-    notificaciones: ['Postulación recibida desde el módulo React.', 'Datos del verificador Vue vinculados al seguimiento.']
-  };
-  return lista;
-}
-function construirSolicitudesIniciales(): SolicitudBeca[] {
-  try {
-    const datos = JSON.parse(localStorage.getItem('becas_datos_estudiante') || 'null');
-    const docs = JSON.parse(localStorage.getItem('becas_documents') || 'null');
-    return aplicarDatos(SOLICITUDES_MOCK, datos, docs);
-  } catch { return structuredClone(SOLICITUDES_MOCK) as SolicitudBeca[]; }
-}
 @Injectable({ providedIn: 'root' })
 export class SeguimientoStoreService {
-  private solicitudesSignal = signal<SolicitudBeca[]>(construirSolicitudesIniciales());
+  private supabase = inject(SupabaseService);
+
+  private solicitudesSignal = signal<SolicitudBeca[]>([]);
   filtroEstado = signal<EstadoSolicitud | 'Todos'>('Todos');
   busqueda = signal('');
+
   solicitudes = this.solicitudesSignal.asReadonly();
+
   solicitudesFiltradas = computed(() => {
-    const estado = this.filtroEstado(); const texto = this.busqueda().toLowerCase().trim();
-    return this.solicitudesSignal().filter((s) => (estado === 'Todos' || s.estado === estado) && (s.codigo.toLowerCase().includes(texto) || s.estudiante.nombre.toLowerCase().includes(texto) || s.beca.nombre.toLowerCase().includes(texto) || s.estudiante.cedula.includes(texto)));
+    const estado = this.filtroEstado();
+    const texto = this.busqueda().toLowerCase().trim();
+
+    return this.solicitudesSignal().filter((s) =>
+      (estado === 'Todos' || s.estado === estado) &&
+      (
+        s.codigo.toLowerCase().includes(texto) ||
+        s.estudiante.nombre.toLowerCase().includes(texto) ||
+        s.beca.nombre.toLowerCase().includes(texto) ||
+        s.estudiante.cedula.includes(texto)
+      )
+    );
   });
-  totalPendientes = computed(() => this.solicitudesSignal().filter((s) => s.estado === 'En revisión' || s.estado === 'Corrección requerida').length);
-  buscarPorId(id: number): SolicitudBeca | undefined { return this.solicitudesSignal().find((s) => s.id === id); }
-  solicitudesPorEstudiante(estudianteId: number): SolicitudBeca[] { return this.solicitudesSignal().filter((s) => s.estudiante.id === estudianteId); }
-  actualizarDesdePortal(datos: any, documentos?: any): void {
-    if (!datos) return;
-    localStorage.setItem('becas_datos_estudiante', JSON.stringify(datos));
-    if (documentos) localStorage.setItem('becas_documents', JSON.stringify(documentos));
-    this.solicitudesSignal.set(aplicarDatos(SOLICITUDES_MOCK, datos, documentos));
+
+  totalPendientes = computed(() =>
+    this.solicitudesSignal().filter(
+      (s) => s.estado === 'En revisión' || s.estado === 'Corrección requerida'
+    ).length
+  );
+
+  constructor() {
+    this.cargarSolicitudesDesdeSupabase();
   }
-  cambiarEstado(id: number, estado: EstadoSolicitud): void { this.solicitudesSignal.update((lista) => lista.map((s) => s.id === id ? { ...s, estado, fechaUltimaRevision: '2026-07-03', notificaciones: [`Estado actualizado a ${estado}.`, ...s.notificaciones] } : s)); }
-  marcarComoLeida(id: number): void { this.solicitudesSignal.update((lista) => lista.map((s) => s.id === id ? { ...s, notificaciones: ['Notificaciones revisadas por el estudiante.', ...s.notificaciones] } : s)); }
+
+  async cargarSolicitudesDesdeSupabase(): Promise<void> {
+    const { data, error } = await this.supabase.client
+      .from('solicitudes')
+      .select(`
+        id,
+        beca_id,
+        promedio,
+        ingresos,
+        estado,
+        observacion,
+        created_at,
+        documentos (
+          id,
+          nombre,
+          url,
+          estado
+        ),
+        seguimiento (
+          id,
+          estado,
+          comentario,
+          created_at
+        ),
+        becas (
+          id,
+          nombre,
+          descripcion
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error cargando solicitudes:', error);
+      return;
+    }
+
+    const solicitudes = (data || []).map((item: any): SolicitudBeca => {
+      const documentosPendientes =
+        item.documentos?.filter((doc: any) => doc.estado !== 'cargado').map((doc: any) => doc.nombre) || [];
+
+      return {
+        id: item.id,
+        codigo: `ULEAM-BECA-${String(item.id).padStart(4, '0')}`,
+        estado: this.mapearEstado(item.estado),
+        fechaPostulacion: item.created_at?.slice(0, 10) || '',
+        fechaUltimaRevision: item.created_at?.slice(0, 10) || '',
+        observaciones: item.observacion || 'Solicitud registrada desde el módulo React.',
+        documentosPendientes,
+        estudiante: {
+          id: 1,
+          nombre: 'Estudiante ULEAM',
+          cedula: 'No registrada',
+          correo: localStorage.getItem('usuario') || 'No registrado',
+          telefono: 'No registrado',
+          carrera: 'Software',
+          semestre: 6,
+          promedio: Number(item.promedio || 0),
+          ingreso: Number(item.ingresos || 0),
+          cargaFamiliar: 4,
+          quintil: 2,
+          padreNombre: 'No registrado',
+          madreNombre: 'No registrado',
+          hermanos: 0,
+          vivienda: 'No registrada'
+        },
+        beca: {
+          id: item.becas?.id || item.beca_id || 1,
+          nombre: item.becas?.nombre || 'Beca ULEAM',
+          tipo: item.becas?.nombre || 'Beca',
+          monto: 0,
+          requisitos: []
+        },
+
+        notificaciones: [
+          'Postulación recibida desde el módulo React.',
+          'Datos cargados desde Supabase.'
+        ]
+      
+      };
+    });
+
+    this.solicitudesSignal.set(solicitudes);
+  }
+
+  private mapearEstado(estado: string): EstadoSolicitud {
+  if (estado === 'pendiente') return 'Recibida';
+  if (estado === 'revision') return 'En revisión';
+  if (estado === 'aprobada') return 'Aprobada';
+  if (estado === 'rechazada') return 'Rechazada';
+  if (estado === 'correccion') return 'Corrección requerida';
+  return 'Recibida';
+}
+
+  buscarPorId(id: number): SolicitudBeca | undefined {
+    return this.solicitudesSignal().find((s) => s.id === id);
+  }
+
+ solicitudesPorEstudiante(estudianteId: number): SolicitudBeca[] {
+  return this.solicitudesSignal();
+}
+
+  actualizarDesdePortal(): void {
+    this.cargarSolicitudesDesdeSupabase();
+  }
+
+  async cambiarEstado(id: number, estado: EstadoSolicitud): Promise<void> {
+    const estadoSupabase = this.estadoParaSupabase(estado);
+
+    const { error } = await this.supabase.client
+      .from('solicitudes')
+      .update({ estado: estadoSupabase })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error actualizando estado:', error);
+      return;
+    }
+
+    await this.supabase.client.from('seguimiento').insert({
+      solicitud_id: id,
+      estado: estadoSupabase,
+      comentario: `Estado actualizado a ${estado}.`
+    });
+
+    await this.cargarSolicitudesDesdeSupabase();
+  }
+
+  private estadoParaSupabase(estado: EstadoSolicitud): string {
+    if (estado === 'Recibida') return 'pendiente';
+    if (estado === 'En revisión') return 'revision';
+    if (estado === 'Aprobada') return 'aprobada';
+    if (estado === 'Rechazada') return 'rechazada';
+    if (estado === 'Corrección requerida') return 'correccion';
+    return 'pendiente';
+  }
+
+  marcarComoLeida(id: number): void {
+    this.solicitudesSignal.update((lista) =>
+      lista.map((s) =>
+        s.id === id
+          ? {
+              ...s,
+              notificaciones: ['Notificaciones revisadas por el estudiante.', ...s.notificaciones]
+            }
+          : s
+      )
+    );
+  }
 }
