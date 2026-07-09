@@ -1,0 +1,150 @@
+<main class="container seguimiento-shell">
+  @if (!auth.estaAutenticado()) {
+    <section class="hero seguimiento-hero">
+      <h1>🎓 Seguimiento de solicitud de beca</h1>
+      <p>Consulta el estado, revisa observaciones y recibe notificaciones simuladas.</p>
+    </section>
+    <section class="aviso-centralizado">
+      <h2>Acceso centralizado desde el portal principal</h2>
+      <p>Para este módulo no hay login interno. Ingresa desde el portal único como estudiante o administrador.</p>
+    </section>
+  } @else {
+    @if (auth.esAdmin()) {
+      <section class="hero seguimiento-hero">
+        <h1>🎓 Seguimiento de solicitud de beca</h1>
+        <p>Panel de administración para revisar, filtrar y actualizar solicitudes.</p>
+      </section>
+      <section class="filtros">
+        <label>
+          Buscar
+          <input [ngModel]="store.busqueda()" (ngModelChange)="store.busqueda.set($event)" placeholder="Código, estudiante, cédula o beca" />
+        </label>
+        <label>
+          Estado
+          <select [ngModel]="store.filtroEstado()" (ngModelChange)="store.filtroEstado.set($event)">
+            <option>Todos</option>
+            @for (estado of estados; track estado) { <option>{{ estado }}</option> }
+          </select>
+        </label>
+      </section>
+      <p class="resumen">Panel administrador: {{ solicitudesVisibles().length }} solicitud(es)</p>
+
+      @if (solicitudesVisibles().length > 0) {
+        <section class="grid">
+          @for (solicitud of solicitudesVisibles(); track solicitud.id) {
+            <app-solicitud-card
+              [solicitud]="solicitud"
+              [modo]="'admin'"
+              [estados]="estados"
+              (verDetalle)="irDetalle($event)"
+              (estadoCambiado)="store.cambiarEstado($event.id, $event.estado)" />
+          }
+        </section>
+      } @else {
+        <p class="vacio">No hay solicitudes con ese filtro.</p>
+      }
+    } @else {
+      @if (solicitudesVisibles()[0]; as s) {
+        <section class="tracking-top">
+          <div>
+            <h1>🎓 Seguimiento de solicitud de beca</h1>
+            <p>Consulta el estado, revisa observaciones y recibe notificaciones simuladas.</p>
+          </div>
+          <select aria-label="Solicitud activa">
+            <option>Solicitud activa</option>
+          </select>
+        </section>
+
+        <section class="summary-card">
+          <div class="summary-info">
+            <p class="codigo">{{ s.codigo }}</p>
+            <h2>{{ s.beca.nombre }}</h2>
+            <div class="summary-grid">
+              <span>👤 {{ s.estudiante.nombre }}</span>
+              <span>🪪 Cédula: {{ s.estudiante.cedula }}</span>
+              <span>📅 Postulación: {{ s.fechaPostulacion }}</span>
+              <span>🎓 Carrera: {{ s.estudiante.carrera }}</span>
+              <span>📚 Semestre: {{ s.estudiante.semestre }}</span>
+              <span>⭐ Promedio: {{ s.estudiante.promedio }}</span>
+            </div>
+          </div>
+          <div class="status-box">
+            <small>Estado actual</small>
+            <strong>{{ s.estado }}</strong>
+            <span>🕘 Última actualización: {{ s.fechaUltimaRevision }}</span>
+          </div>
+        </section>
+
+        <section class="timeline-card">
+          <div class="step done"><span>✓</span><strong>Postulación recibida</strong><small>{{ s.fechaPostulacion }}</small></div>
+          <div class="line"></div>
+          <div class="step done"><span>✓</span><strong>Revisión inicial</strong><small>2026-06-25</small><em>Completado</em></div>
+          <div class="line"></div>
+          <div class="step current"><span>⌛</span><strong>En revisión</strong><small>{{ s.fechaUltimaRevision }}</small><em>Actual</em></div>
+          <div class="line"></div>
+          <div class="step pending"><span>📄</span><strong>Dictamen</strong><small>Pendiente</small></div>
+          <div class="line"></div>
+          <div class="step pending"><span>☑</span><strong>Resultado final</strong><small>Pendiente</small></div>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="info-card">
+            <h2>👤 Información del estudiante</h2>
+            <p><strong>Nombre:</strong><span>{{ s.estudiante.nombre }}</span></p>
+            <p><strong>Cédula:</strong><span>{{ s.estudiante.cedula }}</span></p>
+            <p><strong>Correo:</strong><span>{{ s.estudiante.correo || 'No registrado' }}</span></p>
+            <p><strong>Teléfono:</strong><span>{{ s.estudiante.telefono || 'No registrado' }}</span></p>
+            <p><strong>Carrera:</strong><span>{{ s.estudiante.carrera }}</span></p>
+            <p><strong>Semestre:</strong><span>{{ s.estudiante.semestre }}</span></p>
+            <p><strong>Promedio:</strong><span>{{ s.estudiante.promedio }}</span></p>
+          </article>
+
+          <article class="info-card">
+            <h2>👥 Información socioeconómica</h2>
+            <p><strong>Ingreso familiar:</strong><span>${{ s.estudiante.ingreso || 0 }}</span></p>
+            <p><strong>Carga familiar:</strong><span>{{ s.estudiante.cargaFamiliar || 0 }}</span></p>
+            <p><strong>Quintil:</strong><span>{{ s.estudiante.quintil || 0 }}</span></p>
+            <p><strong>Vivienda:</strong><span>{{ s.estudiante.vivienda || 'No registrada' }}</span></p>
+            <p><strong>Padre:</strong><span>{{ s.estudiante.padreNombre || 'No registrado' }}</span></p>
+            <p><strong>Madre:</strong><span>{{ s.estudiante.madreNombre || 'No registrada' }}</span></p>
+            <p><strong>Hermanos:</strong><span>{{ s.estudiante.hermanos || 0 }}</span></p>
+          </article>
+
+          <article class="info-card review-card">
+            <h2>📋 Información de revisión</h2>
+            <p><strong>Última revisión:</strong><span>{{ s.fechaUltimaRevision }}</span></p>
+            <p><strong>Revisado por:</strong><span>Comisión de Becas ULEAM</span></p>
+            <p><strong>Próxima revisión:</strong><span>Por definir</span></p>
+            <p class="obs"><strong>Observación:</strong><span>{{ s.observaciones }}</span></p>
+          </article>
+
+          <article class="info-card docs-card">
+            <h2>📄 Documentos pendientes</h2>
+            @if (s.documentosPendientes.length > 0) {
+              <ul>@for (doc of s.documentosPendientes; track doc) { <li>{{ doc }}</li> }</ul>
+            } @else {
+              <div class="ok-circle">✓</div>
+              <p>No tienes documentos pendientes.</p>
+              <small>Todos los documentos requeridos han sido cargados.</small>
+            }
+            <button type="button" (click)="irDetalle(s.id)">Ver documentos</button>
+          </article>
+        </section>
+
+        <section class="history-card">
+          <h2>Historial de acciones</h2>
+          <table>
+            <thead><tr><th>Fecha</th><th>Acción</th><th>Descripción</th><th>Usuario</th></tr></thead>
+            <tbody>
+              <tr><td>{{ s.fechaUltimaRevision }} 10:30</td><td><span class="pill orange">En revisión</span></td><td>La solicitud está siendo revisada por la comisión.</td><td>Comisión de Becas</td></tr>
+              <tr><td>2026-06-25 15:45</td><td><span class="pill green">Revisión inicial</span></td><td>Revisión inicial completada correctamente.</td><td>Sistema</td></tr>
+              <tr><td>{{ s.fechaPostulacion }} 09:22</td><td><span class="pill green">Postulación recibida</span></td><td>Solicitud de beca registrada exitosamente.</td><td>{{ s.estudiante.nombre }}</td></tr>
+            </tbody>
+          </table>
+        </section>
+      } @else {
+        <p class="vacio">No hay una solicitud activa para este usuario.</p>
+      }
+    }
+  }
+</main>

@@ -1,0 +1,60 @@
+<main class="container">
+  @if (solicitud(); as s) {
+    <a routerLink="/seguimiento" class="volver">← Volver al listado</a>
+    <section class="detalle">
+      <div class="detalle-header">
+        <div>
+          <p class="codigo">{{ s.codigo }}</p>
+          <h1>{{ s.beca.nombre }}</h1>
+          <p>{{ s.estudiante.nombre }} · Cédula {{ s.estudiante.cedula }}</p>
+          <p>{{ s.estudiante.carrera }} · Semestre {{ s.estudiante.semestre }} · Promedio {{ s.estudiante.promedio }}</p>
+        </div>
+        <span class="estado grande">{{ s.estado }}</span>
+      </div>
+
+      <div class="paneles">
+        <article>
+          <h2>Información del estudiante</h2>
+          <p><strong>Nombre:</strong> {{ s.estudiante.nombre }}</p>
+          <p><strong>Cédula:</strong> {{ s.estudiante.cedula }}</p>
+          <p><strong>Carrera:</strong> {{ s.estudiante.carrera }}</p>
+          <p><strong>Semestre:</strong> {{ s.estudiante.semestre }}</p>
+          <p><strong>Promedio:</strong> {{ s.estudiante.promedio }}</p>
+          <p><strong>Correo:</strong> {{ s.estudiante.correo || 'No registrado' }}</p>
+          <p><strong>Teléfono:</strong> {{ s.estudiante.telefono || 'No registrado' }}</p>
+        </article>
+        <article>
+          <h2>Datos familiares y socioeconómicos</h2>
+          <p><strong>Padre:</strong> {{ s.estudiante.padreNombre || 'No registrado' }}</p>
+          <p><strong>Madre:</strong> {{ s.estudiante.madreNombre || 'No registrado' }}</p>
+          <p><strong>Hermanos:</strong> {{ s.estudiante.hermanos || 0 }}</p>
+          <p><strong>Ingreso familiar:</strong> {{ s.estudiante.ingreso || 0 }}</p>
+          <p><strong>Carga familiar:</strong> {{ s.estudiante.cargaFamiliar || 0 }}</p>
+          <p><strong>Quintil:</strong> {{ s.estudiante.quintil || 0 }}</p>
+          <p><strong>Vivienda:</strong> {{ s.estudiante.vivienda || 'No registrada' }}</p>
+        </article>
+        <article>
+          <h2>Información de revisión</h2>
+          <p><strong>Postulación:</strong> {{ s.fechaPostulacion }}</p>
+          <p><strong>Última revisión:</strong> {{ s.fechaUltimaRevision }}</p>
+          <p><strong>Observación:</strong> {{ s.observaciones }}</p>
+        </article>
+        <article>
+          <h2>Documentos pendientes</h2>
+          @if (s.documentosPendientes.length > 0) {
+            <ul>@for (doc of s.documentosPendientes; track doc) { <li>{{ doc }}</li> }</ul>
+          } @else { <p>No tiene documentos pendientes.</p> }
+        </article>
+      </div>
+
+      <article class="notificaciones">
+        <h2>Notificaciones</h2>
+        <button type="button" (click)="store.marcarComoLeida(s.id)">Simular revisión de notificaciones</button>
+        <ul>@for (nota of store.buscarPorId(s.id)?.notificaciones; track nota) { <li>{{ nota }}</li> }</ul>
+      </article>
+    </section>
+  } @else {
+    <p class="vacio">Solicitud no encontrada o no autorizada para este usuario.</p>
+    <a routerLink="/seguimiento">Volver</a>
+  }
+</main>

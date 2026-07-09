@@ -1,0 +1,5 @@
+[
+  { "id": "doc_identidad", "label": "Cédula", "key": "cedula" },
+  { "id": "cert_notas", "label": "Récord Académico", "key": "record" },
+  { "id": "planilla_luz", "label": "Planilla de luz", "key": "planilla" }
+]

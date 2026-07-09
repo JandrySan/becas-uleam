@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verificador de Elegibilidad - ULEAM</title>
+    <!-- Tus estilos irían aquí o en el main.ts -->
+</head>
+<body>
+    <div id="app">
+        <!-- Todo el contenido visual DEBE ir dentro del body -->
+        <header class="module-hero">
+            <h1>Descubre tu beca ideal en 30 segundos</h1>
+            <p>Responde 3 preguntas simples y conoce tus oportunidades en la ULEAM.</p>
+        </header>
+
+        <main class="eligibility-flow">
+            <form id="checker-form">
+                <!-- Pregunta 1 -->
+                <section class="step" id="step-1">
+                    <label for="promedio">1. ¿Cuál es tu promedio del último semestre?</label>
+                    <input type="number" id="promedio" step="0.1" min="0" max="10" placeholder="Ej: 9.2" required>
+                </section>
+
+                <!-- Pregunta 2 -->
+                <section class="step" id="step-2">
+                    <fieldset>
+                        <legend>2. ¿Perteneces a algún grupo de vulnerabilidad o etnia?</legend>
+                        <div class="options">
+                            <input type="checkbox" id="v1" name="vulnerability" value="etnia">
+                            <label for="v1">Etnia/Pueblo indígena</label>
+                            
+                            <input type="checkbox" id="v2" name="vulnerability" value="discapacidad">
+                            <label for="v2">Discapacidad</label>
+                        </div>
+                    </fieldset>
+                </section>
+
+                <!-- Pregunta 3 -->
+                <section class="step" id="step-3">
+                    <fieldset>
+                        <legend>3. ¿Vives fuera de Manta?</legend>
+                        <input type="radio" id="residencia-si" name="residencia" value="si">
+                        <label for="residencia-si">Sí</label>
+                        
+                        <input type="radio" id="residencia-no" name="residencia" value="no">
+                        <label for="residencia-no">No</label>
+                    </fieldset>
+                </section>
+
+                <!-- Resultado Visual -->
+                <article class="result-card" id="success-result">
+                    <h2>¡Felicidades!</h2>
+                    <p>Eres apto para la <strong>Beca de Movilidad</strong> y <strong>Beca de Mérito Académico</strong>.</p>
+                    <button type="button">Iniciar Postulación</button>
+                </article>
+            </form>
+        </main>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

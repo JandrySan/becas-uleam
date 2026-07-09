@@ -1,0 +1,17 @@
+{
+  "ingresoBasico": 480000,
+  "becas": [
+    {
+      "tipo": "Beca Socioeconómica",
+      "promedioMin": 8.5,
+      "ingresoMax": 480000,
+      "quintilMax": 2
+    },
+    {
+      "tipo": "Beca de Excelencia",
+      "promedioMin": 9.2,
+      "ingresoMax": 600000,
+      "quintilMax": 3
+    }
+  ]
+}

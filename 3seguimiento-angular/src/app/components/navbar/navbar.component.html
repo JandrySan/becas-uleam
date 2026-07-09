@@ -1,0 +1,11 @@
+<nav class="navbar">
+  <strong>🎓 Becas ULEAM</strong>
+  @if (auth.estaAutenticado()) {
+    <a routerLink="/seguimiento">Seguimiento</a>
+    <span>{{ auth.usuario()?.nombre }} · {{ auth.usuario()?.rol }}</span>
+    @if (auth.esAdmin()) {
+      <span>{{ store.totalPendientes() }} pendientes</span>
+    }
+    <button type="button" class="link-button" (click)="salir()">Salir</button>
+  }
+</nav>

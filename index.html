@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Becas ULEAM</title>
+  <style>
+    :root{--verde:#005f3e;--oro:#f5a623;--fondo:#f4f7f5;--borde:#d8e7de;--texto:#17231d}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--fondo);color:var(--texto)}header{background:var(--verde);color:white;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}header h1{font-size:22px;margin:0}header p{margin:4px 0 0;opacity:.9}.userbox{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.userbox button,.tabs button,.login-card button{border:0;border-radius:12px;padding:12px 14px;font-weight:700;cursor:pointer}.userbox button{background:rgba(255,255,255,.18);color:white}.tabs{display:flex;gap:10px;flex-wrap:wrap}.tabs button{background:white;color:var(--verde)}.tabs button.active{background:var(--oro);color:#1b1b1b}.tabs button:disabled{opacity:.45}.login-wrap{min-height:calc(100vh - 96px);display:grid;place-items:center;padding:32px 16px;background:linear-gradient(135deg,#005f3e,#0b7a52)}.login-card{width:min(100%,460px);background:white;border-radius:24px;padding:34px;box-shadow:0 24px 70px rgba(0,0,0,.28)}.login-avatar{width:82px;height:82px;margin:0 auto 16px;border-radius:50%;background:linear-gradient(135deg,#005f3e,#f5a623);display:grid;place-items:center;color:white;font-size:38px}.login-card h2{text-align:center;font-size:28px;margin:0 0 8px;color:var(--verde)}.login-card p{text-align:center;color:#52665c}.login-card label{display:block;font-weight:700;margin-top:16px}.login-card input{width:100%;padding:13px;border:1px solid #cfded5;border-radius:12px;margin-top:6px;font-size:15px}.login-card button{width:100%;background:var(--verde);color:white;margin-top:22px;font-size:16px}.login-note{font-size:13px;margin-top:16px}.bar{max-width:1200px;margin:16px auto 0;padding:0 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.flow{background:white;border:1px solid var(--borde);border-radius:14px;padding:12px 16px}.flow strong{color:var(--verde)}.hint{font-size:14px;color:#47554d}.frame-wrap{max-width:1200px;margin:16px auto 28px;padding:0 16px}.frame-card{background:white;border:1px solid var(--borde);border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.08)}.frame-title{padding:12px 16px;border-bottom:1px solid var(--borde);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}iframe{width:100%;height:780px;border:0;background:white}.open{color:var(--verde);font-weight:700;text-decoration:none}.badge{background:#e7f5ee;color:var(--verde);padding:6px 10px;border-radius:999px;font-size:13px;font-weight:700}code{background:#eef4f0;padding:2px 5px;border-radius:6px}.hidden{display:none!important}.status{padding:10px;border-radius:12px;background:#fff8e6;color:#624000;margin-top:12px;font-size:14px;text-align:center}
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Sistema de Becas ULEAM</h1>
+    <p>Portal único: elegibilidad, postulación y seguimiento.</p>
+  </div>
+
+  <div class="userbox hidden" id="userbox">
+    <strong id="sessionName"></strong>
+    <button id="logoutBtn">Cerrar sesión</button>
+  </div>
+
+  <nav class="tabs hidden" id="tabs">
+    <button class="active" data-src="/vue/" data-title="1. Verificador de elegibilidad" data-tech="Vue">1. Elegibilidad</button>
+    <button data-src="/react/" data-title="2. Postulación y documentos" data-tech="React">2. Postulación</button>
+    <button data-src="/angular/#/seguimiento" data-title="3. Seguimiento de solicitud" data-tech="Angular">3. Seguimiento</button>
+  </nav>
+</header>
+
+<main class="login-wrap" id="loginPanel">
+  <section class="login-card">
+    <div class="login-avatar">🎓</div>
+    <h2>Ingreso único</h2>
+    <p>Accede con tu cuenta registrada en Supabase.</p>
+
+    <label for="loginEmail">Correo institucional</label>
+    <input id="loginEmail" type="email" placeholder="usuario@uleam.edu.ec" autocomplete="email" />
+
+    <label for="loginPassword">Contraseña</label>
+    <input id="loginPassword" type="password" placeholder="Ingresa tu contraseña" autocomplete="current-password" />
+
+    <button id="loginBtn">Ingresar al sistema</button>
+
+    <div id="loginStatus" class="status hidden"></div>
+
+    <p class="login-note">La sesión se comparte con los tres módulos mediante <code>localStorage</code>.</p>
+  </section>
+</main>
+
+<section class="bar hidden" id="flowBar">
+  <div class="flow"><strong>Flujo:</strong> verificar beca → postular → consultar seguimiento.</div>
+  <div class="hint">Producción: una sola URL con <code>/vue/</code>, <code>/react/</code> y <code>/angular/</code>.</div>
+</section>
+
+<main class="frame-wrap hidden" id="appPanel">
+  <section class="frame-card">
+    <div class="frame-title">
+      <div><span class="badge" id="tech">Vue</span> <strong id="title">1. Verificador de elegibilidad</strong></div>
+      <a class="open" id="open" target="_blank" href="/vue/">Abrir en pestaña nueva</a>
+    </div>
+    <iframe id="moduleFrame" src="about:blank" title="Módulo activo"></iframe>
+  </section>
+</main>
+
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

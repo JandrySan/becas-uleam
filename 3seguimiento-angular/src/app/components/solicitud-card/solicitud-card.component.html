@@ -1,0 +1,21 @@
+<article class="card">
+  <div>
+    <p class="codigo">{{ solicitud.codigo }}</p>
+    <h3>{{ solicitud.beca.nombre }}</h3>
+    <p>{{ solicitud.estudiante.nombre }} · {{ solicitud.estudiante.carrera }}</p>
+  </div>
+  <span class="estado">{{ solicitud.estado }}</span>
+
+  @if (modo === 'admin') {
+    <label>
+      Cambiar estado
+      <select [value]="solicitud.estado" (change)="estadoCambiado.emit({ id: solicitud.id, estado: $any($event.target).value })">
+        @for (estado of estados; track estado) {
+          <option [value]="estado">{{ estado }}</option>
+        }
+      </select>
+    </label>
+  }
+
+  <button type="button" (click)="verDetalle.emit(solicitud.id)">Ver detalle</button>
+</article>
