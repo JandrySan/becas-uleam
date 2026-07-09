@@ -52,7 +52,18 @@ export default function VistaPrevia() {
           promedio,
           ingresos,
           estado: 'pendiente',
-          observacion: 'Postulación enviada desde el módulo React.'
+          observacion: JSON.stringify({
+            mensaje: 'Postulación enviada desde el módulo React.',
+            estudiante: {
+              nombre: datosEstudiante.nombreCompleto || 'Estudiante ULEAM',
+              correo: datosEstudiante.correo || '',
+              carrera: datosEstudiante.carrera || 'Software',
+              semestre: datosEstudiante.semestre || 6,
+              promedio,
+              ingreso: ingresos,
+              cargaFamiliar: datosEstudiante.cargaFamiliar || 0
+            }
+          })
         })
         .select()
         .single();
