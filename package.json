@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@11.11.0",
   "workspaces": [
     "1verificador-vue",
     "2postulacion-react",
@@ -11,7 +12,7 @@
   "scripts": {
     "start": "concurrently -n PORTAL,VUE,REACT,ANGULAR -c auto \"pnpm run portal\" \"pnpm --dir 1verificador-vue run dev -- --host 0.0.0.0 --port 5173\" \"pnpm --dir 2postulacion-react run dev -- --host 0.0.0.0 --port 5174\" \"pnpm --dir 3seguimiento-angular run start -- --host 0.0.0.0 --port 4200\"",
     "portal": "vite --host 0.0.0.0 --port 3000",
-    "build": "vite build && pnpm --dir 1verificador-vue run build && pnpm --dir 2postulacion-react run build && pnpm --dir 3seguimiento-angular run build -- --base-href /angular/ && node scripts/build-integrado.mjs",
+    "build": "vite build && pnpm --dir 1verificador-vue run build && pnpm --dir 2postulacion-react run build && pnpm --dir 3seguimiento-angular run build && node scripts/build-integrado.mjs",
     "dev": "vite --host 0.0.0.0 --port 3000"
   },
   "devDependencies": {
