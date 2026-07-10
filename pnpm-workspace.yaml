@@ -1,9 +1,10 @@
 packages:
-  - 1verificador-vue
-  - 2postulacion-react
-  - 3seguimiento-angular
+  - "1verificador-vue"
+  - "2postulacion-react"
+  - "3seguimiento-angular"
 
 allowBuilds:
+  nice-napi: true
   esbuild: true
   lmdb: true
   msgpackr-extract: true
