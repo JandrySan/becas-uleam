@@ -2,19 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm run build",
-  "outputDirectory": "dist",
-  "rewrites": [
-    {
-      "source": "/vue/:path*",
-      "destination": "/vue/index.html"
-    },
-    {
-      "source": "/react/:path*",
-      "destination": "/react/index.html"
-    },
-    {
-      "source": "/angular/:path*",
-      "destination": "/angular/index.html"
-    }
-  ]
+  "outputDirectory": "dist"
 }
