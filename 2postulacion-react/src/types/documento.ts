@@ -5,6 +5,7 @@ export interface DocumentoRequerido {
   id: string;
   label: string;
   key: string;
+  nombre?: string;
 }
 
 /**

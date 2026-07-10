@@ -1,0 +1,10 @@
+packages:
+  - 1verificador-vue
+  - 2postulacion-react
+  - 3seguimiento-angular
+
+allowBuilds:
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true
+  vue-demi: true

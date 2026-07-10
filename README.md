@@ -49,11 +49,14 @@ Crear un proyecto Supabase único para todo el equipo y ejecutar el archivo:
 supabase/schema.sql
 ```
 
-Ese script crea las tablas mínimas y activa RLS para:
+Ese script crea las tablas que usa la app integrada y activa RLS para:
 
-- `perfiles`
-- `solicitudes_beca`
-- `documentos_solicitud`
+- `becas`
+- `solicitudes`
+- `documentos`
+- `seguimiento`
+
+Las operaciones del flujo real de la aplicación se apoyan en estas tablas, por lo que deben existir en el proyecto Supabase compartido antes de probar el flujo completo.
 
 En Vercel configurar las variables de entorno:
 

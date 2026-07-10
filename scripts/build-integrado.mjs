@@ -11,10 +11,10 @@ function copyModule(fromCandidates, target) {
   mkdirSync(dest, { recursive: true });
   cpSync(from, dest, { recursive: true });
 }
-copyModule([join(root, '01-verificador-elegibilidad-vue/dist')], 'vue');
-copyModule([join(root, '02-postulacion-documentos-react/dist')], 'react');
+copyModule([join(root, '1verificador-vue', 'dist')], 'vue');
+copyModule([join(root, '2postulacion-react', 'dist')], 'react');
 copyModule([
-  join(root, '03-seguimiento-solicitud-angular/dist/seguimiento-solicitud-angular/browser'),
-  join(root, '03-seguimiento-solicitud-angular/dist/seguimiento-solicitud-angular')
+  join(root, '3seguimiento-angular', 'dist', 'seguimiento-solicitud-angular', 'browser'),
+  join(root, '3seguimiento-angular', 'dist', 'seguimiento-solicitud-angular')
 ], 'angular');
 console.log('dist integrado listo: /, /vue/, /react/, /angular/');
